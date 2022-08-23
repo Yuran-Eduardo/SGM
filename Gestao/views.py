@@ -3,6 +3,8 @@ from django.shortcuts import render,redirect,reverse
 from rest_framework.response import Response
 from rest_framework.authtoken.serializers import AuthTokenSerializer
 from knox.auth import AuthToken, TokenAuthentication
+
+from Gestao import models
 from .serializers import RegisterSerializer
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -54,12 +56,13 @@ def get_user(request):
         })
     return Response({})
 
+@api_view(['GET'])
 @api_view
 def admin_category_view(request):
     return Response(request,#'nome do Template para o admin ver o form das categorias'
     )
 
-@api_view
+@api_view(['POST'])
 def admin_add_category_view(request):
     categoria = Categoria.objects.all()
     if request.method=='POST':
@@ -70,8 +73,21 @@ def admin_add_category_view(request):
             return Response(serializer.data, status=201)
     return Response(serializer.data,{'serializer':serializer})
 
-@api_view
+@api_view(['GET'])
 def admin_view_category_view(request):
     categories = Categoria.objects.all()
     serializer = CategoriaSerializer(categories)
-    return Response(serializer.data,{'categories':categories})
+    return Response(serializer.data,{'serializer':serializer})
+
+@api_view(['POST'])
+def delete_category_view(request,pk):
+    categoria = models.Categoria.objects.get(id=pk)
+    categoria.delete()
+    serializer = CategoriaSerializer(categoria)
+    return Response(serializer.data)
+
+@api_view(['POST'])
+def admin_update_category_view(request):
+    categorias = models.Category.objects.all()
+    serializer = CategoriaSerializer(categorias)
+    return Response(serializer.data)
