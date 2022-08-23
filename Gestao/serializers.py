@@ -1,6 +1,9 @@
+from dataclasses import fields
 from pyexpat import model
 from rest_framework import serializers
 from django.contrib.auth.models import User
+
+from Gestao.models import Categoria, Gestao
 
 # User Serializer
 class UserSerializer(serializers.ModelSerializer):
@@ -21,5 +24,11 @@ class RegisterSerializer(serializers.ModelSerializer):
         return user
 
 class CategoriaSerializer(serializers.ModelSerializer):
-    category_name = serializers.CharField(max_length=20)
-    creation_date = serializers.DateField(auto_now=True)
+    class meta:
+        model = Categoria
+        fields = ['category_name']
+
+class GestaoSerializer(serializers.ModelSerializer):
+    class meta:
+        model = Gestao
+        fields = ['category','nome_imposto','parcelas','quantia']

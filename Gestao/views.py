@@ -1,8 +1,16 @@
 from rest_framework.decorators import api_view
+from django.shortcuts import render,redirect,reverse
 from rest_framework.response import Response
 from rest_framework.authtoken.serializers import AuthTokenSerializer
 from knox.auth import AuthToken, TokenAuthentication
 from .serializers import RegisterSerializer
+from django.http import HttpResponse, JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from rest_framework.parsers import JSONParser
+from Gestao.models import Categoria, Gestao
+from Gestao.serializers import CategoriaSerializer, GestaoSerializer
+
+
 
 def serialize_user(user):
     return {
@@ -46,3 +54,24 @@ def get_user(request):
         })
     return Response({})
 
+@api_view
+def admin_category_view(request):
+    return Response(request,#'nome do Template para o admin ver o form das categorias'
+    )
+
+@api_view
+def admin_add_category_view(request):
+    categoria = Categoria.objects.all()
+    if request.method=='POST':
+        data = JSONParser().parse(request)
+        serializer = CategoriaSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=201)
+    return Response(serializer.data,{'serializer':serializer})
+
+@api_view
+def admin_view_category_view(request):
+    categories = Categoria.objects.all()
+    serializer = CategoriaSerializer(categories)
+    return Response(serializer.data,{'categories':categories})

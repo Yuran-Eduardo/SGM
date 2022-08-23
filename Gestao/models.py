@@ -8,7 +8,7 @@ class Categoria(models.Model):
         return self.category_name
 
 class Gestao(models.Model):
-    category = models.ForeignKey('Categoria', on_delete=models.CASCADE)
+    category = models.ForeignKey('Categoria', on_delete=models.CASCADE) #Para os funcionarios Escolherem a Categoria que esse imposto se Encontra
     nome_imposto = models.CharField(max_length=100)
     quantia = models.PositiveIntegerField()
     parcelas = models.PositiveIntegerField()
