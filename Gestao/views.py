@@ -5,6 +5,7 @@ from rest_framework.authtoken.serializers import AuthTokenSerializer
 from knox.auth import AuthToken, TokenAuthentication
 
 from Gestao import models
+from Gestao.forms import ImpostosForm
 from .serializers import RegisterSerializer
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -57,14 +58,13 @@ def get_user(request):
     return Response({})
 
 @api_view(['GET'])
-@api_view
 def admin_category_view(request):
-    return Response(request,#'nome do Template para o admin ver o form das categorias'
-    )
+    return Response(request)
 
 @api_view(['POST'])
 def admin_add_category_view(request):
     categoria = Categoria.objects.all()
+    serializer = CategoriaSerializer(categoria)
     if request.method=='POST':
         data = JSONParser().parse(request)
         serializer = CategoriaSerializer(data=request.data)
@@ -76,18 +76,44 @@ def admin_add_category_view(request):
 @api_view(['GET'])
 def admin_view_category_view(request):
     categories = Categoria.objects.all()
-    serializer = CategoriaSerializer(categories)
+    serializer = CategoriaSerializer(categories, many=True)
     return Response(serializer.data,{'serializer':serializer})
 
 @api_view(['POST'])
 def delete_category_view(request,pk):
     categoria = models.Categoria.objects.get(id=pk)
     categoria.delete()
-    serializer = CategoriaSerializer(categoria)
+    serializer = CategoriaSerializer(categoria, data=request.data)
     return Response(serializer.data)
 
 @api_view(['POST'])
 def admin_update_category_view(request):
-    categorias = models.Category.objects.all()
-    serializer = CategoriaSerializer(categorias)
+    categorias = models.Categoria.objects.all()
+    serializer = CategoriaSerializer(categorias, data=request.data)
     return Response(serializer.data)
+
+@api_view(['GET'])
+def admin_policy_view(request):
+    return render(request,)
+
+@api_view(['POST'])
+def admin_add_policy_view(request):
+    impostos = models.Gestao.objects.all()
+    serializer = GestaoSerializer(impostos)
+    if serializer.method=='POST':
+        serializer = GestaoSerializer(impostos, data=request.data)
+        if serializer.is_valid():
+            categoryid = request.POST.get('category')
+            category = models.Categoria.objects.get(id=categoryid)
+            imposto = serializer.save(commit=False)
+            imposto.category=category
+            imposto.save()
+            return Response(serializer.data, status=201)
+    return Response(serializer.data,{'serializer':serializer})
+
+@api_view(['POST'])
+def admin_view_policy_view(request):
+    impostos = models.Gestao.objects.all()
+    serializer = CategoriaSerializer(impostos)
+    return Response(serializer.data,{'serializer':serializer})
+
