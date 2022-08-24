@@ -1,3 +1,4 @@
+from statistics import mode
 from rest_framework.decorators import api_view
 from django.shortcuts import render,redirect,reverse
 from rest_framework.response import Response
@@ -93,11 +94,13 @@ def admin_update_category_view(request):
     return Response(serializer.data)
 
 @api_view(['GET'])
-def admin_policy_view(request):
-    return render(request,)
+def admin_imposto_view(request):
+    impostos = models.Gestao(impostos)
+    serializer = GestaoSerializer(impostos)
+    return Response(serializer.data)
 
 @api_view(['POST'])
-def admin_add_policy_view(request):
+def admin_add_imposto_view(request):
     impostos = models.Gestao.objects.all()
     serializer = GestaoSerializer(impostos)
     if serializer.method=='POST':
@@ -112,8 +115,33 @@ def admin_add_policy_view(request):
     return Response(serializer.data,{'serializer':serializer})
 
 @api_view(['POST'])
-def admin_view_policy_view(request):
+def admin_view_imposto_view(request):
     impostos = models.Gestao.objects.all()
     serializer = CategoriaSerializer(impostos)
+    return Response(serializer.data, status=201)
+
+def admin_update_policy_view(request):
+    impostos = models.Gestao.objects.all()
+    serializer = models.Gestao.objects.all(impostos)
     return Response(serializer.data,{'serializer':serializer})
+
+@api_view(['POST'])
+def update_imposto_view(request,pk):
+
+    imposto = models.Gestao.objects.get(id=pk)
+    serializer=GestaoSerializer(instance=imposto)
+    
+    if request.method=='POST':
+        serializer=GestaoSerializer(data=request.data,instance=policy)
+        
+        if serializer.is_valid():
+
+            categoryid = request.POST.get('category')
+            category = models.Categoria.objects.get(id=categoryid)
+            imposto = serializer.save(commit=False)
+            imposto.category=category
+            imposto.save()
+           
+            return Response(serializer.data, status=201)
+    return render(request,'insurance/update_policy.html',{'policyForm':policyForm})
 
