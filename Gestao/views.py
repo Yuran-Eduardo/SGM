@@ -143,5 +143,5 @@ def update_imposto_view(request,pk):
             imposto.save()
            
             return Response(serializer.data, status=201)
-    return render(request,'insurance/update_policy.html',{'policyForm':policyForm})
+    return Response(serializer.data,{'serializer':serializer})
 
