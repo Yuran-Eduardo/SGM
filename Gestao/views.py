@@ -25,6 +25,12 @@ def serialize_user(user):
         "last_name": user.last_name
     }
 
+@api_view(['GET'])
+def is_customer(user):
+    return user.groups.filter(name='CUSTOMER').exists()
+
+
+
 @api_view(['POST'])
 def login(request):
     serializer = AuthTokenSerializer(data=request.data)
@@ -119,7 +125,7 @@ def admin_view_imposto_view(request):
     impostos = models.Gestao.objects.all()
     serializer = CategoriaSerializer(impostos)
     return Response(serializer.data, status=201)
-
+@api_view(['GET'])
 def admin_update_policy_view(request):
     impostos = models.Gestao.objects.all()
     serializer = models.Gestao.objects.all(impostos)
